@@ -1,0 +1,5 @@
+The total number of apartments is <%= Apartment.good.count %><br>
+<% @apartments.each do |apartment| %>
+  <a href=<%= apartment.formatted_url %>><%= apartment.description %></a>
+  <img src=<%=apartment.image_url %> alt=""><br>
+<% end %>
