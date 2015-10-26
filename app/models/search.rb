@@ -4,10 +4,6 @@ require 'pry-nav'
 require 'nokogiri'
 
 class Search
-  URL = "http://newyork.craigslist.org/search/aap/brk?s="
-  URL2 = "catAbb=aap&query=&minAsk="
-  URL3 = "&maxAsk="
-  URL4 = "&bedrooms=2&housing_type=1&excats="
 
   attr_accessor :min, :max, :links
 
@@ -28,7 +24,6 @@ class Search
   def run
     (1..25).each do |index|
       doc = Nokogiri::HTML(open(url(index)))
-      # binding.pry
       get_links(doc)
       persist
       links.clear
@@ -37,9 +32,7 @@ class Search
   end
 
   def get_links(doc)
-    # binding.pry
     doc.css(".row .pl").each_with_index do |node, index|
-      # binding.pry
       bedrooms = parse_bedroom(index, doc)
       if bedrooms.to_i > 2
         puts "skipping because bedrooms #{bedrooms}"
@@ -55,7 +48,6 @@ class Search
         puts "image exists so skipping"
         next
       end
-      # binding.pry
       links << {:href => href,
        :price => parse_price(index, doc),
        :location => parse_location(index, doc),
@@ -80,11 +72,12 @@ class Search
   end
 
   def parse_image_url(doc)
-    # binding.pry
     image_url = ""
-    if doc.css("#ci").present?
-      image_url = doc.css("#ci").first.children[1].attributes["src"].value
+    image = doc.css("[title~='image 1']")
+    if image.present?
+      image_url = image.first.attributes['src'].value
     end
+    image_url
   end
 
   def parse_description(node)
@@ -97,7 +90,7 @@ class Search
   end
 
   def parse_price(index, doc)
-    doc.css(".row .l2")[index].children[1].children.first.text
+    doc.css(".row .l2")[index].children[1].children.first.text[1..-1].to_i
   end
 
   def parse_location(index, doc)
@@ -109,13 +102,11 @@ class Search
   end
 
   def parse_bedroom(index, doc)
-    # binding.pry
     # node.children[7].children[2].text.match(/\d\w{2}/)[0]
-    doc.css(".row .l2")[index].children[2].text.match(/\d\w{2}/)
+    doc.css(".row .l2")[index].children[3].children[0].text.match(/\d\w{2}/)[0]
   end
 
   def persist
-    binding.pry
     links.each do |link|
       Apartment.create(link)
     end

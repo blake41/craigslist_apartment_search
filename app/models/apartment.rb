@@ -1,7 +1,7 @@
 class Apartment < ActiveRecord::Base
   attr_accessible :bedrooms, :href, :location, :price, :description, :image_url
   
-  LOCATIONS = ["Carroll Gardens", "Cobble Hill", "Boerum Hill", "brooklyn heights"] 
+  LOCATIONS = ["Carroll Gardens", "Cobble Hill", "Boerum Hill", "brooklyn heights", "prospect heights", "Williamsburg"] 
   
   def self.good
     Apartment.where(:location => find_good_hoods).order("created_at DESC")
